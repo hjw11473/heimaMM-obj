@@ -16,7 +16,7 @@ export const list = data => createAPI('/subjects', 'get', data)
 export const simple = data => createAPI('/subjects/simple', 'get', data)
 
 // 学科详情
-export const detail = data => createAPI(`/subjects/${data.id}`, 'get', data)
+export const detail = data => createAPI(`//${data.id}`, 'get', data)
 
 // 学科添加
 export const add = data => createAPI('/subjects', 'post', data)

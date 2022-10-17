@@ -61,87 +61,87 @@
 import { update, add } from '@/api/base/users'
 import { provinces, citys } from '@/api/hmmm/citys.js'
 export default {
-  name: 'CompanysAdd',
-  props: {
-    titleInfo: {
-      type: Object,
-      required: true
-    },
-    formBase: {
-      type: Object,
-      required: true
-    }
-  },
-  data () {
-    return {
-      dialogFormVisible: false,
-      citySelect: {
-        province: [],
-        cityDate: []
-      },
-      // 表单验证
-      ruleInline: {
-        shortName: [
-          { required: true, message: '企业简称不能为空', trigger: 'blur' }
-        ],
-        province: [
-          { required: true, message: '请选择省份', trigger: 'change' }
-        ],
-        tags: [{ required: true, message: '请请输标签', trigger: 'blur' }]
-      }
-    }
-  },
-  computed: {},
-  methods: {
-    // 弹层显示
-    dialogFormV () {
-      this.dialogFormVisible = true
-    },
-    // 弹层隐藏
-    dialogFormH () {
-      this.dialogFormVisible = false
-    },
-    // 获取省
-    getCityData: function () {
-      this.citySelect.province = provinces()
-    },
-    // 选省获取到市
-    handleProvince: function (e) {
-      this.citySelect.cityDate = citys(e)
-      this.formBase.city = this.citySelect.cityDate[0]
-    },
-    // 表单提交
-    createData () {
-      this.$refs.dataForm.validate(async valid => {
-        if (valid) {
-          this.dialogFormH()
-          const data = {
-            ...this.formBase
-          }
-          if (this.formBase.id) {
-            await update(data).then(() => {
-              this.$emit('newDataes', this.formBase)
-            })
-          } else {
-            await add(this.formBase).then(() => {
-              this.$emit('newDataes', this.formBase)
-            })
-          }
-        } else {
-          this.$message.error('*号为必填项!')
+    name: 'CompanysAdd',
+    props: {
+        titleInfo: {
+            type: Object,
+            required: true
+        },
+        formBase: {
+            type: Object,
+            required: true
         }
-      })
-    }
-  },
-  // 挂载结束
+    },
+    data () {
+        return {
+            dialogFormVisible: false,
+            citySelect: {
+                province: [],
+                cityDate: []
+            },
+            // 表单验证
+            ruleInline: {
+                shortName: [
+                    { required: true, message: '企业简称不能为空', trigger: 'blur' }
+                ],
+                province: [
+                    { required: true, message: '请选择省份', trigger: 'change' }
+                ],
+                tags: [{ required: true, message: '请请输标签', trigger: 'blur' }]
+            }
+        }
+    },
+    computed: {},
+    methods: {
+    // 弹层显示
+        dialogFormV () {
+            this.dialogFormVisible = true
+        },
+        // 弹层隐藏
+        dialogFormH () {
+            this.dialogFormVisible = false
+        },
+        // 获取省
+        getCityData: function () {
+            this.citySelect.province = provinces()
+        },
+        // 选省获取到市
+        handleProvince: function (e) {
+            this.citySelect.cityDate = citys(e)
+            this.formBase.city = this.citySelect.cityDate[0]
+        },
+        // 表单提交
+        createData () {
+            this.$refs.dataForm.validate(async valid => {
+                if (valid) {
+                    this.dialogFormH()
+                    const data = {
+                        ...this.formBase
+                    }
+                    if (this.formBase.id) {
+                        await update(data).then(() => {
+                            this.$emit('newDataes', this.formBase)
+                        })
+                    } else {
+                        await add(this.formBase).then(() => {
+                            this.$emit('newDataes', this.formBase)
+                        })
+                    }
+                } else {
+                    this.$message.error('*号为必填项!')
+                }
+            })
+        }
+    },
+    // 挂载结束
 
-  mounted: function () {},
-  // 创建完毕状态
-  created () {
-    this.getCityData()
-  },
-  // 组件更新
-  updated: function () {}
+    mounted: function () {},
+    // 创建完毕状态
+    created () {
+        this.getCityData()
+    },
+    // 组件更新
+    updated: function () {}
 }
 </script>
 <style>
