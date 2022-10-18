@@ -10,7 +10,7 @@
         <!-- 表单区域 -->
         <el-form
           ref="formSate"
-          :rules="rules"
+
           :model="formDate"
           label-width="200px"
         >
@@ -97,7 +97,7 @@
                 v-for="(item, index) in direction"
                 :key="index"
                 :label="item"
-                :value="index"
+                :value="item"
               >
               </el-option>
             </el-select>
@@ -132,7 +132,7 @@
             class="radiodan"
           >
             <div
-              v-for="(item, index) in formDate.options"
+              v-for="(item, index) in ABC"
               :key="index"
               class="radioA"
             >
@@ -157,7 +157,7 @@
 
           <el-form-item label="选项:" v-if="formDate.questionType === 2">
             <div
-              v-for="(item, index) in formDate.options"
+              v-for="(item, index) in ABC"
               :key="index"
               class="radioA"
             >
@@ -175,7 +175,7 @@
               </el-upload>
               <br />
             </div>
-            <el-button type="danger" @click="addQuestion"
+            <el-button :disabled="formDate.questionType === 1" type="danger" @click="addQuestion"
               ><i class="el-icon-plus"></i>增加选项与答案</el-button
             >
           </el-form-item>
@@ -216,7 +216,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @clcik="Confirmsubmission">确认提交</el-button>
+            <el-button type="primary" @click="Confirmsubmission">确认提交</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -235,7 +235,7 @@ import fackClickOutSide from '../../utils/fackClickOutSide.js'
 import { list } from '../../api/hmmm/subjects.js'
 import { list as companyslist } from '../../api/hmmm/companys.js'
 import { simple } from '../../api/hmmm/directorys.js'
-import { add } from '../../api/hmmm/questions.js'
+import { add, update } from '../../api/hmmm/questions.js'
 import { provinces, citys, datas } from '../../api/hmmm/citys.js'
 const toolbarOptions = [
     ['bold', 'italic', 'underline', 'strike'], // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
@@ -258,6 +258,8 @@ export default {
     name: 'HrsaasIndex',
     data() {
         return {
+            type: this.$route.query.type,
+            rows: this.$route.query.row,
             // 富文本编辑器功能
             editorOption: {
                 placeholder: '请输入文本...',
@@ -272,6 +274,31 @@ export default {
             radio: '', // 单选
             checkList: [], // 多选
             tagList: [], // 标签列表
+            ABC: [
+                {
+                    code: 'A', // 代码
+                    title: '', // 标题
+                    img: '', // 图片URL
+                    isRight: false // 是否正确答案 true/false
+                },
+                {
+                    code: 'B', // 代码
+                    title: '', // 标题
+                    img: '', // 图片URL
+                    isRight: false // 是否正确答案 true/false
+                },
+                {
+                    code: 'C', // 代码
+                    title: '', // 标题
+                    img: '', // 图片URL
+                    isRight: false // 是否正确答案 true/false
+                },
+                {
+                    code: 'D', // 代码
+                    title: '', // 标题
+                    img: '', // 图片URL
+                    isRight: false // 是否正确答案 true/false
+                }],
             // 表单
             formDate: {
                 subjectID: '',
@@ -283,32 +310,7 @@ export default {
                 questionType: 1,
                 difficulty: 1,
                 question: '',
-                options: [
-                    {
-                        code: 'A', // 代码
-                        title: '', // 标题
-                        img: '', // 图片URL
-                        isRight: false // 是否正确答案 true/false
-                    },
-                    {
-                        code: 'B', // 代码
-                        title: '', // 标题
-                        img: '', // 图片URL
-                        isRight: false // 是否正确答案 true/false
-                    },
-                    {
-                        code: 'C', // 代码
-                        title: '', // 标题
-                        img: '', // 图片URL
-                        isRight: false // 是否正确答案 true/false
-                    },
-                    {
-                        code: 'D', // 代码
-                        title: '', // 标题
-                        img: '', // 图片URL
-                        isRight: false // 是否正确答案 true/false
-                    }
-                ],
+                options: [],
                 videoURL: '',
                 answer: '',
                 remarks: '',
@@ -340,6 +342,15 @@ export default {
         this.getlistAPI()
         this.getcompanyslistAPI()
         this.provincesslist()
+        if (this.type === 'Basics') {
+            this.$nextTick(() => {
+                console.log(this.rows)
+                this.formDate = this.rows
+                this.formDate.difficulty = +this.formDate.difficulty
+                this.formDate.questionType = +this.formDate.questionType
+                this.formDate.tags = this.formDate.tags.split(',')
+            })
+        }
     },
     methods: {
     // 获取学科select
@@ -388,7 +399,7 @@ export default {
             // 有69个元素是空的，所以直接进行了截取
             const randomAbc = this.setDesc().splice(69)
             const res = [
-                ...this.formDate.options,
+                ...this.ABC,
                 {
                     code: randomAbc[this.i],
                     title: '',
@@ -397,13 +408,51 @@ export default {
                 }
             ]
             this.i++
-            this.formDate.options = res
+            // this.formDate.options = res
+            this.ABC = res
         },
         // 确认提交按钮
         async Confirmsubmission() {
+            // 单选处理
+            if (this.formDate.questionType === 1) {
+                this.ABC.forEach((item, index) => {
+                    if (index === this.radio) {
+                        item.isRight = true
+                    } else {
+                        item.isRight = false
+                    }
+                })
+                this.formDate.options = this.ABC
+            }
+            // console.log(this.formDate.options)
+            // 多选处理
+            if (this.formDate.questionType === 2) {
+                for (let i = 0; i < this.ABC.length; i++) {
+                    this.ABC.forEach(item => {
+                        if (item === i) {
+                            this.ABC[i].isRight = true
+                        }
+                    })
+                }
+                this.formDate.options = this.ABC
+            }
+            // console.log(this.formDate.options)
+
+            // 列表数据处理
+            this.formDate.difficulty = JSON.stringify(this.formDate.difficulty)
+            this.formDate.questionType = JSON.stringify(this.formDate.questionType)
+            this.formDate.tags = this.formDate.tags.join(',')
             await this.$refs.formSate.validate()
-            const res = await add(this.formDate)
-            console.log(res)
+            // console.log(this.type)
+            await add(this.formDate)
+            this.$message.success('新增成功')
+            this.$router.push('list')
+            this.formDate = {}
+            if (this.type === 'Basics') {
+                await update(this.formDate)
+                this.$message.success('修改基础题库成功')
+                this.$router.push('list')
+            }
         }
     }
 }

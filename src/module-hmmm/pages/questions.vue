@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card class="box-card">
-        精选题库
+        基础题库
         <!-- 头部区域 -->
         <div class="header">
           <el-button size="small" type="success" @click="Addtestquestions">
@@ -401,7 +401,7 @@ export default {
         },
         // 新增试题
         Addtestquestions() {
-            this.$router.push('new')
+            this.$router.push('new' + '?type=newadd')
         },
         // 预览试题
         preview(row) {
@@ -411,7 +411,13 @@ export default {
         },
         // 编辑基础题库功能
         async edit(row) {
-            console.log(row)
+            // console.log(row)
+            this.$router.push({
+                path: 'new' + '?type=Basics',
+                query: {
+                    ...row
+                }
+            })
         },
         // 删除列表
         async deletelist(row) {

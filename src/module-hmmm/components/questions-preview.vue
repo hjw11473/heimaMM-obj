@@ -1,5 +1,11 @@
 <template>
-  <el-dialog id="app" title="题目预览" :visible.sync="dialogFormVisible" :before-close="cloes" @open="getdetailAPI">
+  <el-dialog
+    id="app"
+    title="题目预览"
+    :visible.sync="dialogFormVisible"
+    :before-close="cloes"
+    @open="getdetailAPI"
+  >
     <!-- 表头 -->
     <div class="types" style="margin: 20px">
       <span>【题型】：{{ questionTypes }}题 </span>
@@ -15,7 +21,10 @@
     <!-- 单多选择区域 -->
     <div style="margin: 0 20px">
       <div>
-        【题干】：<span style="color: #409eff" v-html="Topicpreview.question"></span>
+        【题干】：<span
+          style="color: #409eff"
+          v-html="Topicpreview.question"
+        ></span>
       </div>
       <p style="margin: 0; margin-bottom: 20px">
         {{ questionTypes }}题选项：（以下选中的选项为正确答案）
@@ -28,12 +37,19 @@
           <el-radio :label="9">备选项</el-radio>
         </el-radio-group> -->
         <!-- 多选 -->
-        <el-checkbox-group :value="Multiplechoice" style="display: flex;flex-direction: column;">
-          <el-checkbox v-for="(item, index) in Topicpreview.options" :key="index" :label="item.isRight"
-            style="margin-bottom: 20px;">
+        <el-checkbox-group
+          :value="Multiplechoice"
+          style="display: flex; flex-direction: column"
+        >
+          <el-checkbox
+            v-for="(item, index) in Topicpreview.options"
+            :key="index"
+            :label="item.isRight"
+            style="margin-bottom: 20px"
+          >
             <template>
               <!-- <span>{{ item.code }}</span> -->
-              <span>{{item.title}}</span>
+              <span>{{ item.title }}</span>
               <img :src="item.img" alt="" />
             </template>
           </el-checkbox>
@@ -45,9 +61,18 @@
     <!-- 视频预览区域 -->
     <div style="margin: 20px">
       <span>【参考答案】：</span>
-      <el-button type="danger" size="small" @click="isshows = !isshows">视频答案预览</el-button>
+      <el-button type="danger" size="small" @click="isshows = !isshows"
+        >视频答案预览</el-button
+      >
       <div style="margin-top: 10px" v-if="isshows">
-        <video width="320" height="240" controls loop="loop" autoplay="autoplay" preload="auto">
+        <video
+          width="320"
+          height="240"
+          controls
+          loop="loop"
+          autoplay="autoplay"
+          preload="auto"
+        >
           <!-- <source src="https://www.runoob.com/try/demo_source/mov_bbb.mp4" type="video/mp4" /> -->
           <source :src="Topicpreview.videoURL" />
         </video>
@@ -67,7 +92,7 @@
     </div>
 
     <!-- footer插槽 -->
-    <div style="margin: 50px 20px 0; margin-left: 90%;">
+    <div style="margin: 50px 20px 0; margin-left: 90%">
       <el-button size="medium" type="primary" @click="cloes">关闭</el-button>
     </div>
   </el-dialog>
@@ -84,7 +109,7 @@ export default {
         },
         rows: {
             type: Object,
-            default: () => { }
+            default: () => {}
         }
     },
     data() {
