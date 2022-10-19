@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card class="box-card">
-        精选题库
+        <span style="color:#ffcad8;">说明：目前支持学科和关键字条件筛选</span>
         <!-- 头部区域 -->
         <div class="header">
           <el-button size="small" type="success" @click="Addtestquestions">
@@ -259,7 +259,7 @@
                 >审核
               </el-button>
               <el-button type="text" :disabled="row.chkState === 2"
-                >修改</el-button
+               @click="modifys(row.id)" >修改</el-button
               >
               <el-button type="text" @click="shelves(row)">{{
                 row.publishState === 0 ? "下架" : "上架"
@@ -286,7 +286,7 @@
     </div>
 
     <!-- 题目预览对话框 -->
-    <questionspreview :dialogFormVisible.sync="isshow"></questionspreview>
+    <questionspreview :questionItem="questionItem" :dialogVisible.sync="isshows"></questionspreview>
     <!-- 题目审核 -->
     <questionscheck
       @chkRemarkslist="choice"
@@ -307,7 +307,7 @@ import {
     publishType
 } from '../../api/hmmm/constants.js'
 import fackClickOutSide from '../../utils/fackClickOutSide.js'
-import { choice, remove, choicePublish } from '../../api/hmmm/questions.js'
+import { choice, remove, choicePublish, detail } from '../../api/hmmm/questions.js'
 import { list } from '../../api/hmmm/subjects.js'
 import { simple } from '../../api/hmmm/directorys.js'
 import { simple as tagssimple } from '../../api/hmmm/tags.js'
@@ -321,7 +321,8 @@ export default {
     components: { questionspreview, questionscheck },
     data() {
         return {
-            isshow: false,
+            questionItem: {},
+            isshows: false,
             isshow1: false,
             activeName: 'first',
             formDate: {
@@ -496,8 +497,19 @@ export default {
             this.$router.push('new')
         },
         // 预览试题
-        preview() {
-            this.isshow = true
+        async preview(row) {
+            const { data } = await detail({ id: row.id })
+            this.questionItem = data
+            this.isshows = true
+        },
+        // 修改试题
+        modifys(id) {
+            this.$router.push({
+                path: 'new' + '?type=Basics' + '&quert=selected',
+                query: {
+                    id
+                }
+            })
         },
         // 审核功能
         toexamine(row) {

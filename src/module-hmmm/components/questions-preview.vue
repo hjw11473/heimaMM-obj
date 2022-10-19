@@ -1,175 +1,165 @@
 <template>
-  <el-dialog
-    id="app"
-    title="题目预览"
-    :visible.sync="dialogFormVisible"
-    :before-close="cloes"
-    @open="getdetailAPI"
-  >
-    <!-- 表头 -->
-    <div class="types" style="margin: 20px">
-      <span>【题型】：{{ questionTypes }}题 </span>
-      <span>【编号】：{{ Topicpreview.id }}</span>
-      <span>【难度】：{{ difficultyss }}</span>
-      <span>【标签】：{{ Topicpreview.tags ? rows.tags : "暂未标签" }}</span>
-      <span>【学科】：{{ Topicpreview.subjectName }}</span>
-      <span>【目录】：{{ Topicpreview.directoryName }}</span>
-      <span>【方向】：{{ Topicpreview.direction }}</span>
-    </div>
-    <hr />
-
-    <!-- 单多选择区域 -->
-    <div style="margin: 0 20px">
-      <div>
-        【题干】：<span
-          style="color: #409eff"
-          v-html="Topicpreview.question"
-        ></span>
+  <div class="container">
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="900px" :before-close="close">
+      <el-row class="text">
+        <el-col :span="6">
+          <span v-if="questionItem.questionType === '1'">【题型】：单选题</span>
+          <span v-else-if="questionItem.questionType === '2'">【题型】：多选题</span>
+          <span v-else>【题型】：简答题</span>
+        </el-col>
+        <el-col :span="6">
+          <span> 【编号】：{{ questionItem.id }}</span>
+        </el-col>
+        <el-col :span="6">
+          <span v-if="questionItem.difficulty === '1'">【题型】：简单</span>
+          <span v-else-if="questionItem.difficulty === '2'">【题型】：一般</span>
+          <span v-else>【题型】：困难</span>
+        </el-col>
+        <el-col :span="6">
+          <span> 【标签】：{{ questionItem.tags }}</span>
+        </el-col>
+      </el-row>
+      <el-row class="text">
+        <el-col :span="6">
+          <span>【学科】：{{ questionItem.subjectID }}</span>
+        </el-col>
+        <el-col :span="6">
+          <span>【目录】：{{ questionItem.difficulty }}</span>
+        </el-col>
+        <el-col :span="6">
+          <span>【方向】：{{ questionItem.direction }}</span>
+        </el-col>
+        <el-col :span="6"> </el-col>
+      </el-row>
+      <hr />
+      <!-- 题干部分 -->
+      <el-row>
+        <el-col>
+          <span>【题干】：</span>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col style="color:blue;">
+          <div v-html="questionItem.question"></div>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col>
+          <span>
+            <span v-if="questionItem.questionType === '1'">单选题</span>
+            <span v-else-if="questionItem.questionType === '2'">多选题</span>
+            <span v-else>简答题</span>选项：（以下选中的选项为正确答案）
+          </span>
+        </el-col>
+      </el-row>
+      <!-- 单选框 -->
+      <!-- data中的数据 radio: 1  由于单选框只有一个isRight 判断相等 按钮选中-->
+      <el-radio-group v-model="radio" v-if="questionItem.questionType === '1'" @change="change">
+        <el-row v-for="(item, index) in questionItem.options" :key="index" style="margin:10px 0px">
+          <el-radio :label="item.isRight">{{ item.title }}</el-radio>
+        </el-row>
+      </el-radio-group>
+      <!-- 多选框 -->
+      <div v-if="questionItem.questionType === '2'">
+        <el-row v-for="(item, index) in options" :key="index" style="margin:10px 0px">
+          <el-checkbox v-model="item.isRight" :disabled="item.isRight === 0" @change="testChange(item)"> {{ item.title }} </el-checkbox>
+        </el-row>
       </div>
-      <p style="margin: 0; margin-bottom: 20px">
-        {{ questionTypes }}题选项：（以下选中的选项为正确答案）
-      </p>
-      <div>
-        <!-- 单选 -->
-        <!-- <el-radio-group v-model="radio">
-          <el-radio :label="3">备选项</el-radio>
-          <el-radio :label="6">备选项</el-radio>
-          <el-radio :label="9">备选项</el-radio>
-        </el-radio-group> -->
-        <!-- 多选 -->
-        <el-checkbox-group
-          :value="Multiplechoice"
-          style="display: flex; flex-direction: column"
-        >
-          <el-checkbox
-            v-for="(item, index) in Topicpreview.options"
-            :key="index"
-            :label="item.isRight"
-            style="margin-bottom: 20px"
-          >
-            <template>
-              <!-- <span>{{ item.code }}</span> -->
-              <span>{{ item.title }}</span>
-              <img :src="item.img" alt="" />
-            </template>
-          </el-checkbox>
-        </el-checkbox-group>
-      </div>
-    </div>
-    <hr />
+      <hr />
+      【参考答案】：<el-button type="danger" @click="isVideoShow = true">视频答案预览</el-button>
+      <el-row style="margin-top:20px;" v-if="isVideoShow">
+        <video :src="questionItem.videoURL" controls="controls" class="video"></video>
+      </el-row>
+      <hr />
+      <el-row class="answer">
+        <span>【答案解析】：<span v-html="questionItem.answer"></span> </span>
+      </el-row>
 
-    <!-- 视频预览区域 -->
-    <div style="margin: 20px">
-      <span>【参考答案】：</span>
-      <el-button type="danger" size="small" @click="isshows = !isshows"
-        >视频答案预览</el-button
-      >
-      <div style="margin-top: 10px" v-if="isshows">
-        <video
-          width="320"
-          height="240"
-          controls
-          loop="loop"
-          autoplay="autoplay"
-          preload="auto"
-        >
-          <!-- <source src="https://www.runoob.com/try/demo_source/mov_bbb.mp4" type="video/mp4" /> -->
-          <source :src="Topicpreview.videoURL" />
-        </video>
-      </div>
-    </div>
-    <hr />
-
-    <!-- 答案解析区域 -->
-    <div style="margin: 20px">
-      <span>【参考解析】：<span v-html="Topicpreview.answerID"></span></span>
-    </div>
-    <hr />
-
-    <!-- 答案解析区域 -->
-    <div style="margin: 20px">
-      <span>【参考备注】：<span v-html="Topicpreview.remarks"></span></span>
-    </div>
-
-    <!-- footer插槽 -->
-    <div style="margin: 50px 20px 0; margin-left: 90%">
-      <el-button size="medium" type="primary" @click="cloes">关闭</el-button>
-    </div>
-  </el-dialog>
+      <hr />
+      <el-row class="answer">
+        <span>
+          【题目备注】：<span v-html="questionItem.remarks"></span>
+        </span>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="close">关 闭</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
-import { difficulty, questionType } from '../../api/hmmm/constants.js'
-import { detail } from '../../api/hmmm/questions.js'
 export default {
-    props: {
-        dialogFormVisible: {
-            type: Boolean,
-            default: false
-        },
-        rows: {
-            type: Object,
-            default: () => {}
+    data () {
+        return {
+            radio: 1,
+            isVideoShow: false
         }
     },
-    data() {
-        return {
-            formData: {
-                username: ''
-            },
-            loading: false,
-            isshows: false,
-            Multiplechoice: [], // 多选框数组
-            Topicpreview: [] // 题目预览数据
-            // questionType: ''
-        }
+    props: {
+        dialogVisible: { type: Boolean, required: true },
+        questionItem: { type: Object, required: true }
     },
     methods: {
-    // 关闭弹窗
-        cloes() {
-            this.$emit('update:dialogFormVisible', false)
+    // 🌈 多选框的change事件
+        testChange (item) {
+            if (item.isRight) {
+                console.log(item.isRight)
+            } else {
+                item.isRight = true
+            }
         },
-        // 获取题目预览数据
-        async getdetailAPI() {
-            const { data } = await detail({ id: this.rows.id })
-            this.Topicpreview = data
-            console.log(data)
+
+        // 单选框点击事件
+        change () {
+            this.radio = 1
+        },
+        // 关闭弹框的事件
+        close () {
+            this.$emit('update:dialogVisible', false)
         }
     },
     computed: {
-    // 显示题型
-        questionTypes() {
-            const res = questionType.find(
-                (item) => item.value === +this.Topicpreview.questionType
-            )
-            return res ? res.label : ''
-        },
-        // 显示难易度
-        difficultyss() {
-            const res = difficulty.find(
-                (item) => item.value === +this.Topicpreview.difficulty
-            )
-            return res ? res.label : ''
+        options () {
+            // 先判断是不是多选题
+            if (this.questionItem.questionType === '2') {
+                if (!this.questionItem.options) {
+                    return // 如果没有题目选项停止后续操作
+                }
+                // 遍历传递过来的题目选项 如果isRight===1 代表该选项是被选中的选项
+                this.questionItem.options.forEach(element => {
+                    if (element.isRight === 1) {
+                        // 将这一项的isRight改为true 多选框就会默认选择
+                        element.isRight = true
+                    }
+                })
+                // 修改完成之后
+                return this.questionItem.options
+            } else {
+                // 如果不是单选题 原路返回传递过来的题目项
+                return this.questionItem.options
+            }
         }
     }
 }
 </script>
 
 <style scoped lang="scss">
-.types {
-  display: flex;
-  align-content: flex-start;
-  flex-flow: row wrap;
-}
-
-.types span {
-  flex: 0 0 25%;
-  margin-bottom: 20px;
-}
-</style>
-<style scoped>
-#app /deep/ .el-dialog {
-  width: 900px;
-  /* height: 100%; */
+.container {
+  .video {
+    width: 400px;
+  }
+  .answer {
+    padding: 8px 0px;
+  }
+  .el-row {
+    .el-col {
+      span {
+        font-size: 14px;
+        color: #606266;
+        line-height: 36px;
+      }
+    }
+  }
 }
 </style>

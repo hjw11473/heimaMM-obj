@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card class="box-card">
-        基础题库
+        <span style="color:#ffcad8;">说明：目前支持学科和关键字条件筛选</span>
         <!-- 头部区域 -->
         <div class="header">
           <el-button size="small" type="success" @click="Addtestquestions">
@@ -218,10 +218,10 @@
             width="220"
           >
             <template class="operation" slot-scope="{ row }">
-              <el-button type="primary" plain circle @click="preview(row)">
+              <el-button type="primary" plain circle @click="previews(row)">
                 <i class="el-icon-view"></i>
               </el-button>
-              <el-button type="success" plain circle @click="edit(row)">
+              <el-button type="success" plain circle @click="edit(row.id)">
                 <i class="el-icon-edit"></i>
               </el-button>
               <el-button type="info" plain circle @click="deletelist(row)">
@@ -251,7 +251,7 @@
     </div>
 
     <!-- 题目预览对话框 -->
-    <questionspreview :rows="rows" :dialogFormVisible.sync="isshow"></questionspreview>
+    <questionspreview :questionItem="questionItem" ref="rows" :dialogVisible.sync="isshow"></questionspreview>
   </div>
 </template>
 
@@ -262,7 +262,7 @@ import {
     direction
 } from '../../api/hmmm/constants.js'
 import fackClickOutSide from '../../utils/fackClickOutSide.js'
-import { list, remove, choiceAdd } from '../../api/hmmm/questions.js'
+import { list, remove, choiceAdd, detail } from '../../api/hmmm/questions.js'
 import { simple } from '../../api/hmmm/directorys.js'
 import { simple as tagssimple } from '../../api/hmmm/tags.js'
 import { provinces, citys, datas } from '../../api/hmmm/citys.js'
@@ -274,6 +274,7 @@ export default {
     components: { questionspreview },
     data() {
         return {
+            questionItem: {},
             loading: false,
             isshow: false,
             isshow1: false,
@@ -309,8 +310,7 @@ export default {
             citysList: [], // 城市
             datas, // 城市数据
             parseTime, // 时间过滤器
-            rowadopt: {}, // 审核数据
-            rows: {} // 预览试题的数据
+            rowadopt: {} // 审核数据
             // choiceState: 1 // 自定义的上架数据
             // citys: datas.datas // 城市名称
         }
@@ -401,21 +401,22 @@ export default {
         },
         // 新增试题
         Addtestquestions() {
-            this.$router.push('new' + '?type=newadd')
+            this.$router.push('new')
         },
         // 预览试题
-        preview(row) {
-            // console.log(row)
-            this.rows = { ...row }
+        async previews(row) {
+            // this.$refs.rows.Topicpreview = row
+            const { data } = await detail({ id: row.id })
+            console.log(data)
+            this.questionItem = data
             this.isshow = true
         },
         // 编辑基础题库功能
-        async edit(row) {
-            // console.log(row)
+        edit(id) {
             this.$router.push({
                 path: 'new' + '?type=Basics',
                 query: {
-                    ...row
+                    id
                 }
             })
         },

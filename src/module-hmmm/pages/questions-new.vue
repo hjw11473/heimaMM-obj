@@ -10,7 +10,7 @@
         <!-- 表单区域 -->
         <el-form
           ref="formSate"
-
+          :rules="rules"
           :model="formDate"
           label-width="200px"
         >
@@ -35,6 +35,7 @@
               v-model="formDate.catalogID"
               clearable
               placeholder="请选择"
+              @change="detailssAPI"
             >
               <el-option
                 v-for="item in simplelist"
@@ -143,9 +144,9 @@
                 v-model="item.title"
                 placeholder="请输入内容"
               ></el-input>
-              <el-upload class="avatar-uploader" action="#" multiple :limit="3">
+              <el-upload class="avatar-uploader" action="#" multiple :limit="3" >
                 <img v-if="item.img" :src="item.img" class="avatar" />
-                <span style="line-height: 60px">上传图片</span>
+                <span style="line-height: 60px" >上传图片</span>
                 <i class="el-icon-close iconclose"></i>
               </el-upload>
               <br />
@@ -173,6 +174,9 @@
                 <span style="line-height: 60px">上传图片</span>
                 <i class="el-icon-close iconclose"></i>
               </el-upload>
+              <el-dialog :visible.sync="dialogVisible" v-model="item.img">
+                 <img width="100%" :src="dialogImageUrl" alt="">
+              </el-dialog>
               <br />
             </div>
             <el-button :disabled="formDate.questionType === 1" type="danger" @click="addQuestion"
@@ -235,7 +239,8 @@ import fackClickOutSide from '../../utils/fackClickOutSide.js'
 import { list } from '../../api/hmmm/subjects.js'
 import { list as companyslist } from '../../api/hmmm/companys.js'
 import { simple } from '../../api/hmmm/directorys.js'
-import { add, update } from '../../api/hmmm/questions.js'
+import { add, update, detail } from '../../api/hmmm/questions.js'
+import { detail as detailss } from '../../api/hmmm/tags.js'
 import { provinces, citys, datas } from '../../api/hmmm/citys.js'
 const toolbarOptions = [
     ['bold', 'italic', 'underline', 'strike'], // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
@@ -258,8 +263,11 @@ export default {
     name: 'HrsaasIndex',
     data() {
         return {
+            dialogVisible: false,
+            dialogImageUrl: '',
             type: this.$route.query.type,
-            rows: this.$route.query.row,
+            ids: this.$route.query.id,
+            quert: this.$route.query.quert,
             // 富文本编辑器功能
             editorOption: {
                 placeholder: '请输入文本...',
@@ -298,7 +306,8 @@ export default {
                     title: '', // 标题
                     img: '', // 图片URL
                     isRight: false // 是否正确答案 true/false
-                }],
+                }
+            ],
             // 表单
             formDate: {
                 subjectID: '',
@@ -338,18 +347,19 @@ export default {
             datas
         }
     },
-    created() {
+    async created() {
         this.getlistAPI()
         this.getcompanyslistAPI()
         this.provincesslist()
-        if (this.type === 'Basics') {
-            this.$nextTick(() => {
-                console.log(this.rows)
-                this.formDate = this.rows
-                this.formDate.difficulty = +this.formDate.difficulty
-                this.formDate.questionType = +this.formDate.questionType
-                this.formDate.tags = this.formDate.tags.split(',')
-            })
+        // console.log(this.quert)
+        if (this.ids) {
+            const { data } = await detail({ id: this.ids })
+            console.log(data)
+            this.formDate = data
+            this.formDate.difficulty = +this.formDate.difficulty
+            this.formDate.questionType = +this.formDate.questionType
+            this.ABC = this.formDate.options
+            this.formDate.tags = this.formDate.tags.split(',')
         }
     },
     methods: {
@@ -361,6 +371,10 @@ export default {
             } catch (err) {
                 console.log(err)
             }
+        },
+        handlePictureCardPreview(file) {
+            this.dialogImageUrl = file.url
+            this.dialogVisible = true
         },
         // 获取二级目录
         async getsimple() {
@@ -383,6 +397,11 @@ export default {
         cityslist() {
             this.citysList = citys(this.formDate.province)
             // console.log(this.citysList)
+        },
+        // 标签渲染
+        async detailssAPI() {
+            const data = await detailss({ subjectID: this.formDate.subjectID })
+            console.log(data)
         },
         // 随机顺序生成ABCDE...字母的函数
         setDesc() {
@@ -444,13 +463,16 @@ export default {
             this.formDate.tags = this.formDate.tags.join(',')
             await this.$refs.formSate.validate()
             // console.log(this.type)
-            await add(this.formDate)
-            this.$message.success('新增成功')
-            this.$router.push('list')
+            console.log(this.ids)
+            this.type === 'Basics'
+                ? await update(this.formDate)
+                : await add(this.formDate)
+            const arr = this.type === 'Basics' ? '修改成功' : '新增成功'
+            this.$message.success(arr)
             this.formDate = {}
-            if (this.type === 'Basics') {
-                await update(this.formDate)
-                this.$message.success('修改基础题库成功')
+            if (this.type === 'Basics' && this.quert === 'selected') {
+                return this.$router.push('choice')
+            } else {
                 this.$router.push('list')
             }
         }
