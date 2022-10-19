@@ -1,6 +1,6 @@
 <template>
   <div class="add-form">
-    <el-dialog :title="text+pageTitle" :visible.sync="dialogFormVisible">
+    <el-dialog :title="text+pageTitle"  @close="handleClose" :visible.sync="dialogFormVisible">
     <el-form :rules="ruleInline" ref="formMenu" :model="formMenu" label-position="left" label-width="120px" style='width: 400px; margin-left:120px;'>
           <el-form-item :label="$t('table.permissionUser')">
               <el-radio-group v-model="type" class="choose-type" @change="handleChooseType">
@@ -192,13 +192,17 @@ export default {
         },
         // 退出
         handleClose () {
-            this.$emit('handleCloseModal')
+            this.dialogFormH()
+            this.$refs.formMenu.resetFields()
         },
         // 菜单和权限点选择：编辑
         handle_Edit (object) {
             update(this.formMenu).then(() => {
                 this.$emit('handleCloseModal')
                 this.$emit('newDataes', this.formMenu)
+                this.$message.success('编辑成功')
+                this.handleClose()
+                this.handleResetForm()
             })
         },
         // 菜单和权限点选择：添加
@@ -208,6 +212,8 @@ export default {
                 // _this.type = 'menu'
                 this.$emit('handleCloseModal')
                 this.$emit('newDataes', this.formMenu)
+                this.$message.success('添加成功')
+                this.handleClose()
             })
         },
         handle_Add (object) {
