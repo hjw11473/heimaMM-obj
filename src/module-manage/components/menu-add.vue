@@ -43,271 +43,271 @@
 </template>
 <script>
 import { list, detail, update, add } from '@/api/base/menus'
-import Utils from '@/components/TreeTable/utils/dataTranslate.js'
+// import Utils from '@/components/TreeTable/utils/dataTranslate.js'
 let _this = []
 export default {
-  name: 'items',
-  // props: ['text', 'pageTitle', 'PermissionGroupsList',],
-  props: {
-    treeStructure: {
-      type: Boolean,
-      default: function () {
-        return false
-      }
-    },
-    // 这个是是否展示操作列
-    text: {
-      type: String
-    },
-    pageTitle: {
-      type: String
-    },
-    PermissionGroupsList: {
-      type: Array
-    }
-  },
-  data () {
-    const validateCode = (rule, value, callback) => {
-      var thisCode = _this.formMenu.code
-      if (value === '') {
-        callback(new Error('代码不能为空'))
-      } else {
-        validateCode.ifHave = false
-        var thisPid = _this.formMenu.pid
-        validateCode.ifHaveCodeExciting = function (oldList) {
-          for (var i = 0; i < oldList.length; i++) {
-            if (oldList[i].childs && oldList[i].childs.length > 0) {
-              validateCode.ifHaveCodeExciting(oldList[i].childs)
+    name: 'items',
+    // props: ['text', 'pageTitle', 'PermissionGroupsList',],
+    props: {
+        treeStructure: {
+            type: Boolean,
+            default: function () {
+                return false
             }
-            if (oldList[i].points && oldList[i].points.length > 0) {
-              if (oldList[i].id === thisPid) {
-                validateCode.doPoints(oldList[i].points)
-              }
-            }
-          }
+        },
+        // 这个是是否展示操作列
+        text: {
+            type: String
+        },
+        pageTitle: {
+            type: String
+        },
+        PermissionGroupsList: {
+            type: Array
         }
-        validateCode.doPoints = function (points) {
-          for (var i = 0; i < points.length; i++) {
-            if (points[i].code && points[i].code === thisCode) {
-              validateCode.ifHave = true
-            }
-          }
-        }
-        validateCode.ifHaveCodeExciting(_this.parentDataList)
-        callback()
-        // if (validateCode.ifHave) {
-        //   callback(new Error('此代码已存在，不能添加相同的！！'))
-        // } else {
-        //   callback()
-        // }
-      }
-    }
-    return {
-      type: 'menu',
-      showMenuBlock: true,
-      showPointBlock: false,
-      dialogFormVisible: false,
-      typeStatus: false,
-      notPointDataList: [],
-      parentDataList: [],
-      formMenu: {
-        pid: '', // 父级Id
-        is_point: '', // 是否权限点
-        code: '', // 菜单代码
-        title: '' // 标题
-      },
-      formPoints: {
-        pid: '', // 父级Id
-        is_point: '', // 是否权限点
-        code: '', // 菜单代码
-        title: '' // 标题
-      },
-      codepast: '',
-      ruleInline: {
-        title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
-        code: [{ required: true, validator: validateCode, trigger: 'blur' }]
-      },
-      leafCount: []
-    }
-  },
-  computed: {},
-  methods: {
-    // 弹层显示
-    dialogFormV () {
-      this.dialogFormVisible = true
     },
-    // 弹层隐藏
-    dialogFormH () {
-      this.dialogFormVisible = false
-    },
-    handleChooseType () {
-      if (this.type === 'menu') {
-        _this.changeToMenu()
-      }
-      if (this.type === 'points') {
-        _this.changeToPoints()
-      }
-    },
-    changeType (flag) {
-      if (flag === 'menu') {
-        this.type = 'menu'
-        _this.changeToMenu()
-      }
-      if (flag === 'points') {
-        this.type = 'points'
-        _this.changeToPoints()
-      }
-      this.typeStatus = true
-    },
-    changeArays () {
-      var changeAray = oldArray => {
-        for (var i = 0; i < oldArray.length; i++) {
-          // 数据没有code并且没有子元素时
-          if (oldArray[i].code !== undefined) {
-            _this.notPointDataList.push(oldArray[i])
-          }
-          // 数据有子元素时
-          if (oldArray[i].childs && oldArray[i].childs.length > 0) {
-            changeAray(oldArray[i].childs)
-          }
-        }
-      }
-      changeAray(_this.parentDataList)
-    },
-    changeToMenu () {
-      _this.showMenuBlock = true
-      _this.showPointBlock = false
-      _this.notPointDataList = []
-      this.changeArays()
-    },
-    changeToPoints () {
-      _this.showMenuBlock = false
-      _this.showPointBlock = true
-      _this.formMenu = _this.formPoints
-      _this.formMenu.pid = _this.formPoints.pid
-      _this.formMenu.code = _this.formPoints.code
-      _this.formMenu.title = _this.formPoints.title
-      _this.notPointDataList = []
-      this.changeArays()
-    },
-    // 退出
-    handleClose () {
-      this.$emit('handleCloseModal')
-    },
-    // 菜单和权限点选择：编辑
-    handle_Edit (object) {
-      update(this.formMenu).then(() => {
-        this.$emit('handleCloseModal')
-        this.$emit('newDataes', this.formMenu)
-      })
-    },
-    // 菜单和权限点选择：添加
-    select_Add () {
-      add(this.formMenu).then(() => {
-        _this.handleResetForm()
-        // _this.type = 'menu'
-        this.$emit('handleCloseModal')
-        this.$emit('newDataes', this.formMenu)
-      })
-    },
-    handle_Add (object) {
-      if (_this.type === 'points') {
-        this.formMenu.is_point = true
-        this.select_Add()
-      } else {
-        this.formMenu.is_point = false
-        this.select_Add()
-      }
-    },
-    // 表单提交
-    handleSubmit (object) {
-      _this.formMenu.pid = Number(_this.formMenu.pid)
-      if (_this.formMenu.id) {
-        var thisCode = _this.formMenu.code // 输入的code值
-        if (thisCode === this.codepast) {
-          // Code不变
-          this.$refs.formMenu.validateField('title')
-          _this.handle_Edit(object)
-        } else {
-          // Code变化
-          _this.$refs[object].validate(valid => {
-            if (valid) {
-              _this.handle_Edit(object)
+    data () {
+        const validateCode = (rule, value, callback) => {
+            var thisCode = _this.formMenu.code
+            if (value === '') {
+                callback(new Error('代码不能为空'))
             } else {
-              this.$Message.error('表单验证失败')
+                validateCode.ifHave = false
+                var thisPid = _this.formMenu.pid
+                validateCode.ifHaveCodeExciting = function (oldList) {
+                    for (var i = 0; i < oldList.length; i++) {
+                        if (oldList[i].childs && oldList[i].childs.length > 0) {
+                            validateCode.ifHaveCodeExciting(oldList[i].childs)
+                        }
+                        if (oldList[i].points && oldList[i].points.length > 0) {
+                            if (oldList[i].id === thisPid) {
+                                validateCode.doPoints(oldList[i].points)
+                            }
+                        }
+                    }
+                }
+                validateCode.doPoints = function (points) {
+                    for (var i = 0; i < points.length; i++) {
+                        if (points[i].code && points[i].code === thisCode) {
+                            validateCode.ifHave = true
+                        }
+                    }
+                }
+                validateCode.ifHaveCodeExciting(_this.parentDataList)
+                callback()
+                // if (validateCode.ifHave) {
+                //   callback(new Error('此代码已存在，不能添加相同的！！'))
+                // } else {
+                //   callback()
+                // }
             }
-          })
         }
-      } else {
-        _this.$refs[object].validate(valid => {
-          if (valid) {
-            _this.handle_Add(object)
-          } else {
-            this.$Message.error('表单验证失败')
-          }
-        })
-      }
+        return {
+            type: 'menu',
+            showMenuBlock: true,
+            showPointBlock: false,
+            dialogFormVisible: false,
+            typeStatus: false,
+            notPointDataList: [],
+            parentDataList: [],
+            formMenu: {
+                pid: '', // 父级Id
+                is_point: '', // 是否权限点
+                code: '', // 菜单代码
+                title: '' // 标题
+            },
+            formPoints: {
+                pid: '', // 父级Id
+                is_point: '', // 是否权限点
+                code: '', // 菜单代码
+                title: '' // 标题
+            },
+            codepast: '',
+            ruleInline: {
+                title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
+                code: [{ required: true, validator: validateCode, trigger: 'blur' }]
+            },
+            leafCount: []
+        }
     },
-    // 表单详情
-    dataRest (obj) {
-      for (var i = 0; i < obj.length; i++) {
-        if (obj[i].childs && obj[i].childs.length > 0) {
-          for (var j = 0; j < obj[i].childs.length; j++) {
-            this.$set(obj[i].childs[j], 'layer', 1)
-          }
-        }
+    computed: {},
+    methods: {
+    // 弹层显示
+        dialogFormV () {
+            this.dialogFormVisible = true
+        },
+        // 弹层隐藏
+        dialogFormH () {
+            this.dialogFormVisible = false
+        },
+        handleChooseType () {
+            if (this.type === 'menu') {
+                _this.changeToMenu()
+            }
+            if (this.type === 'points') {
+                _this.changeToPoints()
+            }
+        },
+        changeType (flag) {
+            if (flag === 'menu') {
+                this.type = 'menu'
+                _this.changeToMenu()
+            }
+            if (flag === 'points') {
+                this.type = 'points'
+                _this.changeToPoints()
+            }
+            this.typeStatus = true
+        },
+        changeArays () {
+            var changeAray = oldArray => {
+                for (var i = 0; i < oldArray.length; i++) {
+                    // 数据没有code并且没有子元素时
+                    if (oldArray[i].code !== undefined) {
+                        _this.notPointDataList.push(oldArray[i])
+                    }
+                    // 数据有子元素时
+                    if (oldArray[i].childs && oldArray[i].childs.length > 0) {
+                        changeAray(oldArray[i].childs)
+                    }
+                }
+            }
+            changeAray(_this.parentDataList)
+        },
+        changeToMenu () {
+            _this.showMenuBlock = true
+            _this.showPointBlock = false
+            _this.notPointDataList = []
+            this.changeArays()
+        },
+        changeToPoints () {
+            _this.showMenuBlock = false
+            _this.showPointBlock = true
+            _this.formMenu = _this.formPoints
+            _this.formMenu.pid = _this.formPoints.pid
+            _this.formMenu.code = _this.formPoints.code
+            _this.formMenu.title = _this.formPoints.title
+            _this.notPointDataList = []
+            this.changeArays()
+        },
+        // 退出
+        handleClose () {
+            this.$emit('handleCloseModal')
+        },
+        // 菜单和权限点选择：编辑
+        handle_Edit (object) {
+            update(this.formMenu).then(() => {
+                this.$emit('handleCloseModal')
+                this.$emit('newDataes', this.formMenu)
+            })
+        },
+        // 菜单和权限点选择：添加
+        select_Add () {
+            add(this.formMenu).then(() => {
+                _this.handleResetForm()
+                // _this.type = 'menu'
+                this.$emit('handleCloseModal')
+                this.$emit('newDataes', this.formMenu)
+            })
+        },
+        handle_Add (object) {
+            if (_this.type === 'points') {
+                this.formMenu.is_point = true
+                this.select_Add()
+            } else {
+                this.formMenu.is_point = false
+                this.select_Add()
+            }
+        },
+        // 表单提交
+        handleSubmit (object) {
+            _this.formMenu.pid = Number(_this.formMenu.pid)
+            if (_this.formMenu.id) {
+                var thisCode = _this.formMenu.code // 输入的code值
+                if (thisCode === this.codepast) {
+                    // Code不变
+                    this.$refs.formMenu.validateField('title')
+                    _this.handle_Edit(object)
+                } else {
+                    // Code变化
+                    _this.$refs[object].validate(valid => {
+                        if (valid) {
+                            _this.handle_Edit(object)
+                        } else {
+                            this.$Message.error('表单验证失败')
+                        }
+                    })
+                }
+            } else {
+                _this.$refs[object].validate(valid => {
+                    if (valid) {
+                        _this.handle_Add(object)
+                    } else {
+                        this.$Message.error('表单验证失败')
+                    }
+                })
+            }
+        },
+        // 表单详情
+        dataRest (obj) {
+            for (var i = 0; i < obj.length; i++) {
+                if (obj[i].childs && obj[i].childs.length > 0) {
+                    for (var j = 0; j < obj[i].childs.length; j++) {
+                        this.$set(obj[i].childs[j], 'layer', 1)
+                    }
+                }
 
-        this.$set(obj[i], 'layer', 0)
-      }
-    },
-    hanldeEditForm (objeditId) {
-      this.formMenu.id = objeditId
-      list().then(data => {
-        _this.parentDataList = data.data
-        _this.notPointDataList = []
-        this.dataRest(data.data)
-        this.changeArays()
-      })
-      detail({ id: objeditId }).then(data => {
-        this.formMenu.id = data.data.id
-        this.formMenu.pid = data.data.pid
-        this.formMenu.title = data.data.title
-        this.formMenu.code = data.data.code
-        this.formMenu.is_point = data.data.is_point
-        const responseData = data.data
-        const choose = this.type
-        if (choose === 'points') {
-          this.formMenu.code = data.data.code
+                this.$set(obj[i], 'layer', 0)
+            }
+        },
+        hanldeEditForm (objeditId) {
+            this.formMenu.id = objeditId
+            list().then(data => {
+                _this.parentDataList = data.data
+                _this.notPointDataList = []
+                this.dataRest(data.data)
+                this.changeArays()
+            })
+            detail({ id: objeditId }).then(data => {
+                this.formMenu.id = data.data.id
+                this.formMenu.pid = data.data.pid
+                this.formMenu.title = data.data.title
+                this.formMenu.code = data.data.code
+                this.formMenu.is_point = data.data.is_point
+                const responseData = data.data
+                const choose = this.type
+                if (choose === 'points') {
+                    this.formMenu.code = data.data.code
+                }
+                if (responseData.pid === null) {
+                    this.formMenu.pid = 0
+                }
+            })
+        },
+        // 表单重置
+        handleResetForm () {
+            this.formMenu.id = ''
+            this.formMenu.pid = 0
+            this.formMenu.title = ''
+            this.formMenu.code = ''
+            _this.typeStatus = false
+            _this.type = 'menu'
+            list().then(data => {
+                _this.parentDataList = data.data
+                _this.notPointDataList = _this.parentDataList
+                this.dataRest(data.data)
+                _this.changeToMenu()
+            })
         }
-        if (responseData.pid === null) {
-          this.formMenu.pid = 0
-        }
-      })
     },
-    // 表单重置
-    handleResetForm () {
-      this.formMenu.id = ''
-      this.formMenu.pid = 0
-      this.formMenu.title = ''
-      this.formMenu.code = ''
-      _this.typeStatus = false
-      _this.type = 'menu'
-      list().then(data => {
-        _this.parentDataList = data.data
-        _this.notPointDataList = _this.parentDataList
-        this.dataRest(data.data)
-        _this.changeToMenu()
-      })
-    }
-  },
-  // 挂载结束
-  mounted: function () {},
-  // 创建完毕状态
-  created () {
-    _this = this
-  },
-  // 组件更新
-  updated: function () {}
+    // 挂载结束
+    mounted: function () {},
+    // 创建完毕状态
+    created () {
+        _this = this
+    },
+    // 组件更新
+    updated: function () {}
 }
 </script>
 <style>

@@ -76,66 +76,66 @@
 <script>
 import { detail, update, add } from '@/api/base/users'
 export default {
-  name: 'usersAdd',
-  props: [
-    'text',
-    'pageTitle',
-    'PermissionGroupsList',
-    'formBase',
-    'ruleInline'
-  ],
-  data () {
-    return {
-      dialogFormVisible: false
-      // fileList: [],
-      // importFileUrl: 'https://jsonplaceholder.typicode.com/posts/',
-    }
-  },
-  computed: {},
-  methods: {
-    // 弹层显示
-    dialogFormV () {
-      this.dialogFormVisible = true
-    },
-    // 弹层隐藏
-    dialogFormH () {
-      this.dialogFormVisible = false
-    },
-    // 退出
-    handleClose () {
-      this.$emit('handleCloseModal')
-    },
-
-    // 表单提交
-    createData () {
-      this.$refs.dataForm.validate(valid => {
-        if (valid) {
-          this.$emit('handleCloseModal')
-          const data = {
-            ...this.formBase
-          }
-          if (this.formBase.id) {
-            update(data).then(() => {
-              this.$emit('newDataes', this.formBase)
-            })
-          } else {
-            add(this.formBase).then(() => {
-              this.$emit('newDataes', this.formBase)
-            })
-          }
-        } else {
-          this.$Message.error('*号为必填项!')
+    name: 'usersAdd',
+    props: [
+        'text',
+        'pageTitle',
+        'PermissionGroupsList',
+        'formBase',
+        'ruleInline'
+    ],
+    data () {
+        return {
+            dialogFormVisible: false
+            // fileList: [],
+            // importFileUrl: 'https://jsonplaceholder.typicode.com/posts/',
         }
-      })
-    }
-  },
-  // 挂载结束
+    },
+    computed: {},
+    methods: {
+    // 弹层显示
+        dialogFormV () {
+            this.dialogFormVisible = true
+        },
+        // 弹层隐藏
+        dialogFormH () {
+            this.dialogFormVisible = false
+        },
+        // 退出
+        handleClose () {
+            this.$emit('handleCloseModal')
+        },
 
-  mounted: function () {},
-  // 创建完毕状态
-  created () {},
-  // 组件更新
-  updated: function () {}
+        // 表单提交
+        createData () {
+            this.$refs.dataForm.validate(valid => {
+                if (valid) {
+                    this.$emit('handleCloseModal')
+                    const data = {
+                        ...this.formBase
+                    }
+                    if (this.formBase.id) {
+                        update(data).then(() => {
+                            this.$emit('newDataes', this.formBase)
+                        })
+                    } else {
+                        add(this.formBase).then(() => {
+                            this.$emit('newDataes', this.formBase)
+                        })
+                    }
+                } else {
+                    this.$Message.error('*号为必填项!')
+                }
+            })
+        }
+    },
+    // 挂载结束
+
+    mounted: function () {},
+    // 创建完毕状态
+    created () {},
+    // 组件更新
+    updated: function () {}
 }
 </script>
 <style>

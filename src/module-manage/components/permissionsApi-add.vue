@@ -29,124 +29,124 @@ import { detail, update, add } from '@/api/base/permissions'
 import { list } from '@/api/base/menus.js'
 let _this = []
 export default {
-  name: 'PermissionGroupsApiAdd',
-  props: ['apiTitle', 'ruleInline'],
-  data () {
-    return {
-      dialogFormVisible: false,
-      PermissionGroupsmenu: [],
-      defaultProps: {
-        label: 'title'
-      },
-      formBase: {
-        id: 0,
-        title: '',
-        apis: []
-      },
-      PermissionApiData: [],
-      checkedData: []
-    }
-  },
-  computed: {
+    name: 'PermissionGroupsApiAdd',
+    props: ['apiTitle', 'ruleInline'],
+    data () {
+        return {
+            dialogFormVisible: false,
+            PermissionGroupsmenu: [],
+            defaultProps: {
+                label: 'title'
+            },
+            formBase: {
+                id: 0,
+                title: '',
+                apis: []
+            },
+            PermissionApiData: [],
+            checkedData: []
+        }
+    },
+    computed: {
     // 菜单权限树
-    treeData () {
-      const checkedData = this.PermissionApiData
+        treeData () {
+            const checkedData = this.PermissionApiData
 
-      const checked = false
-      if (_this !== null && _this.formBase.apis.length > 0) {
-        const per = _this.formBase.apis.map(item => {
-          return item
-        })
-        const use = per.map(item => {
-          checkedData.filter(mini => {
-            if (mini.id === item) {
-              mini.checked = true
+            const checked = false
+            if (_this !== null && _this.formBase.apis.length > 0) {
+                const per = _this.formBase.apis.map(item => {
+                    return item
+                })
+                const use = per.map(item => {
+                    checkedData.filter(mini => {
+                        if (mini.id === item) {
+                            mini.checked = true
+                        }
+                    })
+                })
             }
-          })
-        })
-      }
-      return checkedData
-    }
-  },
-  methods: {
+            return checkedData
+        }
+    },
+    methods: {
     // 逻辑业务
     // **********************************
     // **********************************
     // 弹层显示
-    dialogFormV () {
-      this.dialogFormVisible = true
-    },
-    // 弹层隐藏
-    dialogFormH () {
-      this.dialogFormVisible = false
-    },
-    // 退出
-    handleClose () {
-      this.$emit('handleCloseModal')
-    },
-    // 节点复选框被选中
-    handleCheckChange (nodes) {
-      var checkedData = []
-      checkedData.push(nodes)
-    },
-    // 高级接口数据列表
-    loadApiPermissionData () {
-      list().then((ret, err) => {
-        if (err) {
-          return err
-        }
-        _this.PermissionApiData = ret.data
-      })
-    },
-    // 高级接口表单详情数据加载
-    hanldeEditApiForm (objeditId) {
-      // 获取权限标题
-      this.formBase.id = objeditId
-      details({ id: objeditId }).then((ret, err) => {
-        if (err) {
-          return err
-        }
-        this.formBase.id = ret.data.id
-        this.formBase.title = ret.data.title
-      })
-      _this.loadApiPermissionData()
-      // 读取授权
-      apiread({ id: objeditId }).then((ret, err) => {
-        if (err) {
-          return err
-        }
-        this.formBase.apis = ret.data.apis
-      })
-    },
-    // 表单提交
-    handleSave (object) {
-      const curApis = []
-      for (const it of _this.checkedData) {
-        curApis.push(it.id)
-      }
-      this.$refs[object].validate(valid => {
-        if (valid) {
-          this.$emit('handleCloseModal')
-          apiadd({ id: _this.formBase.id, apis: curApis }).then((ret, err) => {
-            if (err) {
-              return err
+        dialogFormV () {
+            this.dialogFormVisible = true
+        },
+        // 弹层隐藏
+        dialogFormH () {
+            this.dialogFormVisible = false
+        },
+        // 退出
+        handleClose () {
+            this.$emit('handleCloseModal')
+        },
+        // 节点复选框被选中
+        handleCheckChange (nodes) {
+            var checkedData = []
+            checkedData.push(nodes)
+        },
+        // 高级接口数据列表
+        loadApiPermissionData () {
+            list().then((ret, err) => {
+                if (err) {
+                    return err
+                }
+                _this.PermissionApiData = ret.data
+            })
+        },
+        // 高级接口表单详情数据加载
+        hanldeEditApiForm (objeditId) {
+            // 获取权限标题
+            this.formBase.id = objeditId
+            details({ id: objeditId }).then((ret, err) => {
+                if (err) {
+                    return err
+                }
+                this.formBase.id = ret.data.id
+                this.formBase.title = ret.data.title
+            })
+            _this.loadApiPermissionData()
+            // 读取授权
+            apiread({ id: objeditId }).then((ret, err) => {
+                if (err) {
+                    return err
+                }
+                this.formBase.apis = ret.data.apis
+            })
+        },
+        // 表单提交
+        handleSave (object) {
+            const curApis = []
+            for (const it of _this.checkedData) {
+                curApis.push(it.id)
             }
-            this.$emit('newDataes', this.formBase)
-          })
-        } else {
-          this.$Message.error('*号为必填项!')
+            this.$refs[object].validate(valid => {
+                if (valid) {
+                    this.$emit('handleCloseModal')
+                    apiadd({ id: _this.formBase.id, apis: curApis }).then((ret, err) => {
+                        if (err) {
+                            return err
+                        }
+                        this.$emit('newDataes', this.formBase)
+                    })
+                } else {
+                    this.$Message.error('*号为必填项!')
+                }
+            })
         }
-      })
-    }
-  },
-  // 挂载结束
-  mounted: function () {},
-  // 创建完毕状态
-  created () {
-    _this = this
-  },
-  // 组件更新
-  updated: function () {}
+    },
+    // 挂载结束
+    mounted: function () {},
+    // 创建完毕状态
+    created () {
+        _this = this
+    },
+    // 组件更新
+    updated: function () {}
 }
 </script>
 <style>
