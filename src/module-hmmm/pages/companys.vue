@@ -2,183 +2,103 @@
   <div class="enterprisemanage-container">
     <el-card class="box-card">
       <!-- 头部搜索 -->
+      <div class="formdate" >
       <el-form :inline="true" :model="formInline" class="demo-form-inline" label-width="80px">
-      <el-row>
-       <el-col :span="6">
-           <el-form-item label="标签名称">
+        <el-form-item label="标签名称">
           <el-input v-model="formInline.tags"></el-input>
         </el-form-item>
-       </el-col>
-      <el-col :span="6">
 
         <el-form-item label="城市">
-        <el-select v-model="formInline.province" placeholder="选择省级城市" @change="changeProvince">
-          <el-option
-          v-for="(item, index) in provincesList"
-          :key="index"
-          :label="item"
-          :value="item"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      </el-col>
+          <el-select v-model="formInline.province" placeholder="选择省级城市" @change="changeProvince">
+            <el-option v-for="(item, index) in provincesList" :key="index" :label="item" :value="item"></el-option>
+          </el-select>
+        </el-form-item>
 
-      <el-col :span="6">
         <el-form-item label="地区">
-        <el-select v-model="formInline.city" placeholder="选择子级城市">
-          <el-option
-          v-for="(item, index) in citysList"
-          :key="index"
-          :label="item"
-          :value="item"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      </el-col>
+          <el-select v-model="formInline.city" placeholder="选择子级城市">
+            <el-option v-for="(item, index) in citysList" :key="index" :label="item" :value="item"></el-option>
+          </el-select>
+        </el-form-item>
 
-      <el-col :span="6">
-         <el-form-item label="企业简称">
-        <el-input v-model="formInline.shortName"></el-input>
-      </el-form-item>
-      </el-col>
+        <el-form-item label="企业简称">
+          <el-input v-model="formInline.shortName"></el-input>
+        </el-form-item>
 
-      </el-row>
+        <el-form-item label="状态">
+          <el-select v-model="formInline.state" placeholder="选择状态">
+            <el-option label="启用" value="1"></el-option>
+            <el-option label="禁用" value="0"></el-option>
+          </el-select>
+        </el-form-item>
 
+        <el-form-item>
+          <el-button style="margin-left:40px" @click="clear">清除</el-button>
+          <el-button type="primary" @click="onSubmit">搜索</el-button>
+        </el-form-item>
+
+        <el-form-item />
+
+        <!-- 新增用户 -->
+        <el-form-item>
+          <el-button style="float: right;" type="success" icon="el-icon-edit" @click="addNewUsers">新增用户</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
+      <!--通知栏 -->
       <el-row>
-        <el-col :span="12">
-          <el-form-item label="状态">
-        <el-select v-model="formInline.state" placeholder="选择状态">
-          <el-option label="启用" value="1"></el-option>
-          <el-option label="禁用" value="0"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button style="margin-left:40px" @click="clear">清除</el-button>
-        <el-button type="primary" @click="onSubmit">搜索</el-button>
-      </el-form-item>
-        </el-col>
-       <!-- 新增用户 -->
-       <el-col :span="12">
-        <el-row type="flex" justify="end">
-           <el-button type="success" icon="el-icon-edit" @click="addNewUsers">新增用户</el-button>
-        </el-row>
-       </el-col>
-      </el-row>
-    </el-form>
-
-    <!--通知栏 -->
-    <el-row>
-       <el-alert
-          :title="`共${counts}条记录`"
-          type="info"
-          show-icon
-          :closable="false"
-          >
+        <el-alert :title="`共${counts}条记录`" type="info" show-icon :closable="false">
         </el-alert>
-    </el-row>
+      </el-row>
 
-    <!-- 表格 -->
-    <el-row>
-      <el-table
-      :data="tableData"
-      style="width: 100%">
-      <el-table-column
-        label="序号"
-        type="index"
-        :index="1"
-        width="139">
-      </el-table-column>
-      <el-table-column
-        prop="number"
-        label="企业编号"
-        width="134">
-      </el-table-column>
-      <el-table-column
-        prop="shortName"
-        label="企业简称"
-         width="134">
-      </el-table-column>
-       <el-table-column
-         prop="tags"
-         label="标签"
-         width="134"
-         >
-      </el-table-column>
-       <el-table-column
-        prop="creatorID"
-        label="创建者"
-         width="120">
-      </el-table-column>
-       <el-table-column
-        label="创建日期"
-         width="160">
-        <template v-slot="{ row }">
-            {{ row.addDate | parseTimeByString }}
-          </template>
-      </el-table-column>
-       <el-table-column
-        prop="remarks"
-        label="备注"
-         width="134">
-      </el-table-column>
-       <el-table-column
-         prop="state"
-         label="状态"
-         width="134"
-         :formatter="formattertags"
-         >
-      </el-table-column>
-       <el-table-column
-        label="操作"
-        width="180">
-         <template slot-scope="{row}">
-           <el-button type="primary" icon="el-icon-edit" circle @click="edit(row)" plain></el-button>
-           <el-tooltip
-           class="item"
-           effect="dark"
-           :content="row.state === 1 ? '禁用':'启用'"
-           placement="top"
-           >
-            <el-button
-            :type="row.state === 0 ? 'warning' : 'success'"
-            :icon="row.state === 0 ? 'el-icon-close' : 'el-icon-check'"
-            circle
-            @click="disable(row)"
-            plain>
-            </el-button>
-    </el-tooltip>
-           <el-button type="danger" icon="el-icon-delete" circle @click="del(row)" plain></el-button>
-      </template>
-      </el-table-column>
-    </el-table>
-    </el-row>
-    <!-- 分页 -->
-    <el-row type="flex" justify="space-between" align="middle" style="height:60px">
-      <el-col :span="12"></el-col>
-     <el-col :span="12">
-        <el-row type="flex" justify="end">
-           <el-pagination
-          background
-          @size-change="ChangeSize"
-          @current-change="ChangePage"
-          :current-page="page"
-          :page-sizes="[10, 20, 30, 50]"
-          :page-size="10"
-          layout=" prev, pager, next, sizes, jumper"
-          :total="counts"
-          >
-        </el-pagination>
-        </el-row>
-     </el-col>
-    </el-row>
-    <!-- 弹出层 -->
-    <companys-add
-    @refresh-TheList="renderTheList"
-    :dialogFormVisible.sync="dialogFormVisible"
-    :titleInfo="titinfo"
-    :formBase.sync="formBase"
-    ></companys-add>
-      </el-card>
+      <!-- 表格 -->
+        <el-table :data="tableData" style="width: 100%">
+          <el-table-column align="center" label="序号" type="index" :index="1" >
+          </el-table-column>
+          <el-table-column align="center"  prop="number" label="企业编号">
+          </el-table-column>
+          <el-table-column align="center"  prop="shortName" label="企业简称" >
+          </el-table-column>
+          <el-table-column align="center"  prop="tags" label="标签">
+          </el-table-column>
+          <el-table-column align="center"  prop="creatorID" label="创建者" >
+          </el-table-column>
+          <el-table-column align="center"  label="创建日期">
+            <template v-slot="{ row }">
+              {{ row.addDate | parseTimeByString }}
+            </template>
+          </el-table-column>
+          <el-table-column align="center"  prop="remarks" label="备注" >
+          </el-table-column>
+          <el-table-column align="center"  prop="state" label="状态" :formatter="formattertags">
+          </el-table-column>
+          <el-table-column align="center"  label="操作" width="250">
+            <template slot-scope="{row}">
+              <el-button type="primary" icon="el-icon-edit" circle @click="edit(row)" plain></el-button>
+              <el-tooltip class="item" effect="dark" :content="row.state === 1 ? '禁用':'启用'" placement="top">
+                <el-button :type="row.state === 0 ? 'warning' : 'success'"
+                  :icon="row.state === 0 ? 'el-icon-close' : 'el-icon-check'" circle @click="disable(row)" plain>
+                </el-button>
+              </el-tooltip>
+              <el-button type="danger" icon="el-icon-delete" circle @click="del(row)" plain></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      <!-- 分页 -->
+      <el-row type="flex" justify="space-between" align="middle" style="height:60px">
+        <el-col :span="12"></el-col>
+        <el-col :span="12">
+          <el-row type="flex" justify="end">
+            <el-pagination background @size-change="ChangeSize" @current-change="ChangePage" :current-page="page"
+              :page-sizes="[10, 20, 30, 50]" :page-size="10" layout=" prev, pager, next, sizes, jumper" :total="counts">
+            </el-pagination>
+          </el-row>
+        </el-col>
+      </el-row>
+      <!-- 弹出层 -->
+      <companys-add @refresh-TheList="renderTheList" :dialogFormVisible.sync="dialogFormVisible" :titleInfo="titinfo"
+        :formBase.sync="formBase"></companys-add>
+    </el-card>
   </div>
 </template>
 
@@ -188,7 +108,7 @@ import { provinces, citys } from '@/api/hmmm/citys.js'
 import baseApi from '@/api/base/baseApi.js'
 import CompanysAdd from '../components/companys-add.vue'
 export default {
-    data () {
+    data() {
         return {
             formInline: {
                 tags: '',
@@ -211,7 +131,7 @@ export default {
         }
     },
 
-    created () {
+    created() {
         this.renderTheList()
         this.provinces()
     },
@@ -219,7 +139,7 @@ export default {
         CompanysAdd
     },
     methods: {
-        // 渲染列表
+    // 渲染列表
         renderTheList() {
             this.list({
                 page: this.page,
@@ -324,29 +244,49 @@ export default {
 </script>
 
 <style scoped lang='scss'>
-  // self
-  .enterprisemanage-container {
-    padding: 20px;
-     .box-card {
-      width: 100%;
-      min-height: 500px;
+// self
+.enterprisemanage-container {
+  padding: 20px;
+
+  .box-card {
+    width: 100%;
+    min-height: 500px;
   }
-  }
+}
+
 </style>
 
 <style scoped lang="scss">
 // ele
-  .el-form-item, .el-form-item--medium {
-    margin-right: 0px;
-  }
-   ::v-deep .el-input__inner {
-   width: 234px;
-   height: 32px;
-  }
-  ::v-deep .el-pagination__sizes .el-input .el-input__inner {
-    width:100px;
-  }
-  ::v-deep .el-pagination__editor.el-input .el-input__inner {
-    width: 46px;
-  }
+.el-form-item,
+.el-form-item--medium {
+  margin-right: 0px;
+}
+
+// ::v-deep .el-input__inner {
+//   width: 100%;
+//   height: 32px;
+// }
+
+::v-deep .el-form-item__content {
+  width: 100%;
+}
+
+::v-deep .el-pagination__editor.el-input .el-input__inner {
+  width: 46px;
+}
+
+::v-deep .el-select {
+  width: 100%;
+}
+::v-deep .el-form{
+  display: flex;
+  align-content: flex-start;
+  flex-flow: row wrap;
+}
+::v-deep .el-form-item {
+  display: flex;
+  flex: 0 0 25%;
+  margin-bottom: 20px;
+}
 </style>
