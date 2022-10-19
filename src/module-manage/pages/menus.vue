@@ -69,6 +69,7 @@ export default {
             this.$refs.menuRef.changeType(f)
             this.$refs.menuRef.hanldeEditForm(row.id) // ref是弹出框的ref，拿到他身上的这个方法hanldeEditForm
         },
+        // 删除
         async removeUser (data) {
             try {
                 await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
