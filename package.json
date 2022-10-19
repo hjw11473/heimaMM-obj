@@ -9,8 +9,11 @@
     "fix": "vue-cli-service lint format"
   },
   "dependencies": {
+    "@wangeditor/editor": "^5.1.14",
+    "@wangeditor/editor-for-vue": "^1.0.2",
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
+    "dayjs": "1.11.4",
     "echarts": "^4.6.0",
     "element-ui": "^2.13.0",
     "font-awesome": "^4.7.0",
@@ -24,6 +27,7 @@
     "vue-i18n": "^8.15.3",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.1.5",
+    "vue-video-player": "^5.0.2",
     "vuex": "^3.1.2"
   },
   "devDependencies": {

@@ -9,6 +9,16 @@ export default {
         value: '禁用'
     }
     ],
+    statusCode: [
+        {
+            id: '1',
+            value: '启用'
+        },
+        {
+            id: '0',
+            value: '禁用'
+        }
+    ],
     role: [{
         id: '1',
         value: '管理员'
