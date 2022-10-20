@@ -6,19 +6,19 @@
 
 <script>
 export default {
-  data () {
-    return {
+    data () {
+        return {
+
+        }
+    },
+
+    created () {
+
+    },
+
+    methods: {
 
     }
-  },
-
-  created () {
-
-  },
-
-  methods: {
-
-  }
 }
 </script>
 

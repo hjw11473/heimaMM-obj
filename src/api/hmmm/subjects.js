@@ -13,10 +13,10 @@ import { createAPI } from '@/utils/request'
 export const list = data => createAPI('/subjects', 'get', data)
 
 // 学科简单列表
-export const simple = data => createAPI('/subjects/simple', 'get', data)
+export const simple = () => createAPI('/subjects/simple', 'get')
 
 // 学科详情
-export const detail = data => createAPI(`/subjects/${data.id}`, 'get', data)
+export const detail = data => createAPI('/subjects/', 'get', data)
 
 // 学科添加
 export const add = data => createAPI('/subjects', 'post', data)
@@ -25,4 +25,4 @@ export const add = data => createAPI('/subjects', 'post', data)
 export const update = data => createAPI(`/subjects/${data.id}`, 'put', data)
 
 // 学科删除
-export const remove = data => createAPI(`/subjects/${data.id}`, 'delete', data)
+export const remove = id => createAPI(`/subjects/${id}`, 'delete')
