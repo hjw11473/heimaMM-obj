@@ -327,6 +327,7 @@ export default {
           await remove({
             id: scope.row.id,
           });
+          console.log(1);
           this.getList();
         })
         .catch((err) => {
