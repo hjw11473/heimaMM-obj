@@ -13,7 +13,7 @@ import { createAPI } from '@/utils/request'
 export const list = data => createAPI('/tags', 'get', data)
 
 // 标签简单列表
-export const simple = data => createAPI('/tags/simple', 'get', data)
+export const simple = () => createAPI('/tags/simple', 'get')
 
 // 标签详情
 export const detail = data => createAPI(`/tags/${data.id}`, 'get', data)
@@ -25,7 +25,7 @@ export const add = data => createAPI('/tags', 'post', data)
 export const update = data => createAPI(`/tags/${data.id}`, 'put', data)
 
 // 标签删除
-export const remove = data => createAPI(`/tags/${data.id}`, 'delete', data)
+export const remove = id => createAPI(`/tags/${id}`, 'delete')
 
 // 标签状态
 export const changeState = data => createAPI(`/tags/${data.id}/${data.state}`, 'post', data)
